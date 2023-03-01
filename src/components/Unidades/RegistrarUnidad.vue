@@ -29,7 +29,11 @@
           @borrarTodo="onBorrarTodo"
         />
         <div class="has-text-centered">
-          <b-button @click="guardar" size="is-large" type="is-success"
+          <b-button
+            class="mr-6"
+            @click="guardar"
+            size="is-large"
+            type="is-success"
             >Guardar</b-button
           >
         </div>
@@ -40,7 +44,8 @@
 <script>
 import TecladoNumerico from '../TecladoNumerico.vue';
 import { obtenerRutas } from '@/services/RutasService';
-import { insertarUnidad } from '@/services/UnidadesService';
+import { insertarUnidad, obtenerUnidades } from '@/services/UnidadesService';
+import { obtenerRolSeleccionadoParaElDia } from '@/services/RolesService';
 export default {
   components: { TecladoNumerico },
   data: () => ({
@@ -50,12 +55,21 @@ export default {
       ruta: null,
     },
     rutas: [],
+    rolSeleccionado: {},
   }),
   async mounted() {
     this.rutas = await obtenerRutas();
+    this.rolSeleccionado = await obtenerRolSeleccionadoParaElDia();
+    this.elegirRutaAutomaticamenteSegunRol();
     this.refrescarHora();
   },
   methods: {
+    async elegirRutaAutomaticamenteSegunRol() {
+      const unidades = await obtenerUnidades(0, new Date().getTime());
+      let indice = unidades.length % this.rolSeleccionado.rutas.length; // Magia TODO: restar especiales y ver si en el índice no hay una deshabilitada
+      const rutaSegunRol = this.rolSeleccionado.rutas[indice];
+      this.unidad.ruta = rutaSegunRol;
+    },
     async guardar() {
       if (!this.unidad.numero) {
         return;
@@ -68,8 +82,9 @@ export default {
       this.unidad = {
         hora: new Date(),
         numero: null,
-        ruta: null,  // Aquí es cuando debemos obtener la siguiente ruta según rol. tal vez invocar al mounted de nuevo porque eso se debe hacer al inicio
+        ruta: null,
       };
+      await this.elegirRutaAutomaticamenteSegunRol();
     },
     onBorrarTodo() {
       this.unidad.numero = null;
