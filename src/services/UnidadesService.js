@@ -8,8 +8,16 @@ export const insertarUnidad = async (numero, entrada, ruta) => {
     })
     return valoresInsertados[0];
 }
-export const obtenerUnidades = async () => {
+export const obtenerUnidades = async (inicio, fin) => {
     return await conexion.select({
         from: "unidades",
+        where: {
+            entrada: {
+                "-": {
+                    low: inicio,
+                    high: fin
+                }
+            },
+        }
     });
 }
