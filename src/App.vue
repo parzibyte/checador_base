@@ -12,6 +12,9 @@
         <b-navbar-item tag="router-link" :to="{ name: 'VerRoles' }"
           ><b-icon icon="sync" class="mr-1"></b-icon> Roles</b-navbar-item
         >
+        <b-navbar-item tag="router-link" :to="{ name: 'Ajustes' }">
+          <b-icon icon="cog" class="mr-1"></b-icon> Ajustes</b-navbar-item
+        >
       </template>
     </b-navbar>
     <section class="section">
