@@ -6,8 +6,18 @@
           >Registrar nueva</b-button
         >
         <b-table :data="rutas" :striped="true">
+          <b-table-column
+            :td-attrs="atributosCelda"
+            field="color"
+            label="Color"
+          >
+            &nbsp;
+          </b-table-column>
           <b-table-column field="nombre" label="Nombre" v-slot="props">
             {{ props.row.nombre }}
+          </b-table-column>
+          <b-table-column field="id" label="Horario" v-slot="props">
+            {{ props.row.horarioInicio }} a {{ props.row.horarioFin }}
           </b-table-column>
           <b-table-column field="id" label="Eliminar" v-slot="props">
             <b-button @click="eliminar(props.row)" type="is-danger">
@@ -32,6 +42,11 @@ export default {
     await this.obtenerRutas();
   },
   methods: {
+    atributosCelda(ruta) {
+      return {
+        style: { backgroundColor: ruta.color },
+      };
+    },
     registrarNuevaRuta() {
       this.$router.push({
         name: "RegistrarRuta",
