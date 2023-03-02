@@ -5,7 +5,7 @@
         <b-button @click="registrarNuevaUnidad" type="is-info" class="mb-2"
           >Registrar nueva</b-button
         >
-        <b-table :data="unidades" :striped="true">
+        <b-table :loading="cargando" :data="unidades" :striped="true">
           <b-table-column field="numero" label="Numero" v-slot="props">
             {{ props.row.numero }}
           </b-table-column>
@@ -67,6 +67,7 @@ import { obtenerUnidades } from '@/services/UnidadesService';
 import conexion from '@/services/BaseDeDatosService';
 export default {
   data: () => ({
+    cargando: false,
     unidades: [],
     horaActual: new Date(),
     idTimeout: null,
@@ -85,14 +86,17 @@ export default {
       }
     },
     async eliminarUnidad(id) {
+      this.cargando = true;
       await conexion.remove({
         from: "unidades",
         where: {
           id,
         }
       });
+      this.cargando = false;
     },
     async eliminarDeLaLista(indice) {
+      this.cargando = true;
       const cantidadDeUnidades = this.unidades.length;
       for (let i = indice; i < cantidadDeUnidades - 1; i++) {
         const siguienteUnidad = this.unidades[i + 1];
@@ -109,8 +113,10 @@ export default {
       }
       await this.eliminarUnidad(this.unidades[indice].id);
       await this.obtenerUnidades();
+      this.cargando = false;
     },
     async darSalida(unidad) {
+      this.cargando = true;
       await conexion.update({
         in: "unidades",
         set: {
@@ -123,6 +129,7 @@ export default {
       });
       this.$buefy.toast.open("Salida marcada correctamente");
       await this.obtenerUnidades();
+      this.cargando = false;
     },
     transcurrido(entrada) {
       const transcurrido = new Date(this.horaActual - new Date(entrada));
@@ -135,6 +142,7 @@ export default {
       this.idTimeout = setTimeout(this.refrescarHora, 500);
     },
     async moverHaciaAdelante(indice) {
+      this.cargando = true;
       if (indice <= 0) {
         this.$buefy.toast.open("No se puede mover hacia adelante la primera unidad");
         return;
@@ -163,6 +171,7 @@ export default {
         }
       });
       await this.obtenerUnidades();
+      this.cargando = false;
     },
     atributosCelda(unidad) {
       return {
@@ -175,7 +184,9 @@ export default {
       });
     },
     async obtenerUnidades() {
+      this.cargando = true;
       this.unidades = await obtenerUnidades(1677692874827, new Date().getTime());
+      this.cargando = false;
     },
   }
 }
