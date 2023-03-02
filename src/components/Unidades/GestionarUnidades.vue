@@ -45,7 +45,9 @@
                 >Mover hacia adelante</b-dropdown-item
               >
               <b-dropdown-item>Asignar tacopan</b-dropdown-item>
-              <b-dropdown-item>Eliminar de la lista</b-dropdown-item>
+              <b-dropdown-item @click="eliminarDeLaLista(props.index)"
+                >Eliminar de la lista</b-dropdown-item
+              >
               <b-dropdown-item>Mover al fondo</b-dropdown-item>
               <b-dropdown-item>Reemplazar con Huapaltepec</b-dropdown-item>
             </b-dropdown>
@@ -75,6 +77,32 @@ export default {
     clearTimeout(this.idTimeout);
   },
   methods: {
+    async eliminarUnidad(id) {
+      await conexion.remove({
+        from: "unidades",
+        where: {
+          id,
+        }
+      });
+    },
+    async eliminarDeLaLista(indice) {
+      const cantidadDeUnidades = this.unidades.length;
+      for (let i = indice; i < cantidadDeUnidades - 1; i++) {
+        const siguienteUnidad = this.unidades[i + 1];
+        const unidadActual = this.unidades[i];
+        await conexion.update({
+          in: "unidades",
+          set: {
+            ruta: unidadActual.ruta,
+          },
+          where: {
+            id: siguienteUnidad.id,
+          }
+        });
+      }
+      await this.eliminarUnidad(this.unidades[indice].id);
+      await this.obtenerUnidades();
+    },
     async darSalida(unidad) {
       await conexion.update({
         in: "unidades",
