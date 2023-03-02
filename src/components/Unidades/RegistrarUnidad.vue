@@ -44,7 +44,7 @@
 <script>
 import TecladoNumerico from '../TecladoNumerico.vue';
 import { obtenerRutas } from '@/services/RutasService';
-import { insertarUnidad, obtenerUnidades } from '@/services/UnidadesService';
+import { insertarUnidad, obtenerConteoUnidadesIncluyendoSalidas, } from '@/services/UnidadesService';
 import { obtenerRolSeleccionadoParaElDia } from '@/services/RolesService';
 export default {
   components: { TecladoNumerico },
@@ -65,8 +65,8 @@ export default {
   },
   methods: {
     async elegirRutaAutomaticamenteSegunRol() {
-      const unidades = await obtenerUnidades(0, new Date().getTime());
-      let indice = unidades.length % this.rolSeleccionado.rutas.length; // Magia TODO: restar especiales y ver si en el índice no hay una deshabilitada
+      const cantidadUnidades = await obtenerConteoUnidadesIncluyendoSalidas(0, new Date().getTime());
+      let indice = cantidadUnidades % this.rolSeleccionado.rutas.length; // Magia TODO: restar especiales y ver si en el índice no hay una deshabilitada
       const rutaSegunRol = this.rolSeleccionado.rutas[indice];
       this.unidad.ruta = rutaSegunRol;
     },

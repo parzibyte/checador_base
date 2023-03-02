@@ -9,7 +9,12 @@ const obtenerBaseDeDatos = () => {
         columns: {
             id: {
                 primaryKey: true,
-                autoIncrement: true
+                autoIncrement: true,
+                dataType: DATA_TYPE.Number,
+            },
+            prioridad: {
+                autoIncrement: true,
+                dataType: DATA_TYPE.Number,
             },
             numero: {
                 notNull: true,

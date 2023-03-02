@@ -6,7 +6,7 @@
           >Registrar nueva</b-button
         >
         <b-table :data="unidades" :striped="true">
-          <b-table-column sortable field="numero" label="Numero" v-slot="props">
+          <b-table-column field="numero" label="Numero" v-slot="props">
             {{ props.row.numero }}
           </b-table-column>
           <b-table-column field="entrada" label="Entrada" v-slot="props">
@@ -38,8 +38,10 @@
                 para
                 <strong> {{ props.row.ruta.nombre }}</strong>
               </b-dropdown-item>
-              <b-dropdown-item>Dar salida</b-dropdown-item>
-              <b-dropdown-item @click="moverHaciaAdelante(props.row)"
+              <b-dropdown-item @click="darSalida(props.row)"
+                >Dar salida</b-dropdown-item
+              >
+              <b-dropdown-item @click="moverHaciaAdelante(props.index)"
                 >Mover hacia adelante</b-dropdown-item
               >
               <b-dropdown-item>Asignar tacopan</b-dropdown-item>
@@ -58,6 +60,7 @@
 </template>
 <script>
 import { obtenerUnidades } from '@/services/UnidadesService';
+import conexion from '@/services/BaseDeDatosService';
 export default {
   data: () => ({
     unidades: [],
@@ -72,6 +75,20 @@ export default {
     clearTimeout(this.idTimeout);
   },
   methods: {
+    async darSalida(unidad) {
+      await conexion.update({
+        in: "unidades",
+        set: {
+          salida: new Date().getTime(),
+          segundosDesdeSalidaAnterior: 999,//TODO: obtener de un lugar confiable
+        },
+        where: {
+          id: unidad.id,
+        }
+      });
+      this.$buefy.toast.open("Salida marcada correctamente");
+      await this.obtenerUnidades();
+    },
     transcurrido(entrada) {
       const transcurrido = new Date(this.horaActual - new Date(entrada));
       transcurrido.setTime(transcurrido.getTime() + transcurrido.getTimezoneOffset() * 60 * 1000)
@@ -82,8 +99,35 @@ export default {
       clearTimeout(this.idTimeout);
       this.idTimeout = setTimeout(this.refrescarHora, 500);
     },
-    moverHaciaAdelante(unidad) {
-      console.log({ unidad });
+    async moverHaciaAdelante(indice) {
+      if (indice <= 0) {
+        this.$buefy.toast.open("No se puede mover hacia adelante la primera unidad");
+        return;
+      }
+
+      const unidadAnterior = this.unidades[indice - 1];
+      const unidadActual = this.unidades[indice];
+      await conexion.update({
+        in: "unidades",
+        set: {
+          entrada: unidadAnterior.entrada,
+          numero: unidadAnterior.numero,
+        },
+        where: {
+          id: unidadActual.id,
+        }
+      });
+      await conexion.update({
+        in: "unidades",
+        set: {
+          entrada: unidadActual.entrada,
+          numero: unidadActual.numero,
+        },
+        where: {
+          id: unidadAnterior.id,
+        }
+      });
+      await this.obtenerUnidades();
     },
     atributosCelda(unidad) {
       return {
