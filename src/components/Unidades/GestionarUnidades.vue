@@ -6,8 +6,47 @@
           >Registrar nueva</b-button
         >
         <b-table :data="unidades" :striped="true">
-          <b-table-column field="nombre" label="Nombre" v-slot="props">
-            {{ props.row }}
+          <b-table-column sortable field="numero" label="Numero" v-slot="props">
+            {{ props.row.numero }}
+          </b-table-column>
+          <b-table-column field="entrada" label="Entrada" v-slot="props">
+            {{ props.row.entrada | fechaAPartirDeMilisegundos }}
+            <strong>
+              {{ transcurrido(props.row.entrada) | fechaAPartirDeMilisegundos }}
+            </strong>
+          </b-table-column>
+          <b-table-column
+            :td-attrs="atributosCelda"
+            field="ruta"
+            label="Ruta"
+            v-slot="props"
+          >
+            {{ props.row.ruta.nombre }}
+          </b-table-column>
+          <b-table-column field="numero" label="Opciones" v-slot="props">
+            <b-dropdown>
+              <template #trigger="{ active }">
+                <b-button
+                  label="Opciones"
+                  type="is-primary"
+                  :icon-right="active ? 'menu-up' : 'menu-down'"
+                />
+              </template>
+              <b-dropdown-item class="has-text-centered">
+                Unidad
+                <strong>{{ props.row.numero }} </strong>
+                para
+                <strong> {{ props.row.ruta.nombre }}</strong>
+              </b-dropdown-item>
+              <b-dropdown-item>Dar salida</b-dropdown-item>
+              <b-dropdown-item @click="moverHaciaAdelante(props.row)"
+                >Mover hacia adelante</b-dropdown-item
+              >
+              <b-dropdown-item>Asignar tacopan</b-dropdown-item>
+              <b-dropdown-item>Eliminar de la lista</b-dropdown-item>
+              <b-dropdown-item>Mover al fondo</b-dropdown-item>
+              <b-dropdown-item>Reemplazar con Huapaltepec</b-dropdown-item>
+            </b-dropdown>
           </b-table-column>
           <template #empty>
             <div class="has-text-centered">No hay datos</div>
@@ -22,18 +61,42 @@ import { obtenerUnidades } from '@/services/UnidadesService';
 export default {
   data: () => ({
     unidades: [],
+    horaActual: new Date(),
+    idTimeout: null,
   }),
   async mounted() {
+    this.refrescarHora();
     await this.obtenerUnidades();
   },
+  beforeDestroy() {
+    clearTimeout(this.idTimeout);
+  },
   methods: {
+    transcurrido(entrada) {
+      const transcurrido = new Date(this.horaActual - new Date(entrada));
+      transcurrido.setTime(transcurrido.getTime() + transcurrido.getTimezoneOffset() * 60 * 1000)
+      return transcurrido;
+    },
+    refrescarHora() {
+      this.horaActual = new Date();
+      clearTimeout(this.idTimeout);
+      this.idTimeout = setTimeout(this.refrescarHora, 500);
+    },
+    moverHaciaAdelante(unidad) {
+      console.log({ unidad });
+    },
+    atributosCelda(unidad) {
+      return {
+        style: { backgroundColor: unidad.ruta.color },
+      };
+    },
     registrarNuevaUnidad() {
       this.$router.push({
         name: "RegistrarUnidad",
       });
     },
     async obtenerUnidades() {
-      this.unidades = await obtenerUnidades();
+      this.unidades = await obtenerUnidades(1677692874827, new Date().getTime());
     },
   }
 }

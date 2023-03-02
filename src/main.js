@@ -7,6 +7,12 @@ import router from "./router"
 
 Vue.config.productionTip = false
 Vue.use(Buefy)
+const formateador = new Intl.DateTimeFormat("es-MX", {
+  timeStyle: "medium"
+});
+Vue.filter("fechaAPartirDeMilisegundos", milisegundos => {
+  return formateador.format(new Date(milisegundos));
+});
 
 new Vue({
   render: h => h(App),
