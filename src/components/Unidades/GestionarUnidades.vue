@@ -48,7 +48,9 @@
               <b-dropdown-item @click="eliminarDeLaLista(props.index)"
                 >Eliminar de la lista</b-dropdown-item
               >
-              <b-dropdown-item>Mover al fondo</b-dropdown-item>
+              <b-dropdown-item @click="moverAlFondo(props.index)"
+                >Mover al fondo</b-dropdown-item
+              >
               <b-dropdown-item>Reemplazar con Huapaltepec</b-dropdown-item>
             </b-dropdown>
           </b-table-column>
@@ -77,6 +79,11 @@ export default {
     clearTimeout(this.idTimeout);
   },
   methods: {
+    async moverAlFondo(indice) {
+      for (let i = indice + 1; i < this.unidades.length; i++) {
+        await this.moverHaciaAdelante(i);
+      }
+    },
     async eliminarUnidad(id) {
       await conexion.remove({
         from: "unidades",
