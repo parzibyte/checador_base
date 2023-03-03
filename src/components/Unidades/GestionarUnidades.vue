@@ -11,8 +11,10 @@
           </b-table-column>
           <b-table-column field="entrada" label="Entrada" v-slot="props">
             {{ props.row.entrada | fechaAPartirDeMilisegundos }}
-            <strong>
-              {{ transcurrido(props.row.entrada) | fechaAPartirDeMilisegundos }}
+            <strong v-if="props.row.horaLlamada">
+              {{
+                transcurrido(props.row.horaLlamada) | fechaAPartirDeMilisegundos
+              }}
             </strong>
           </b-table-column>
           <b-table-column
@@ -38,7 +40,12 @@
                 para
                 <strong> {{ props.row.ruta.nombre }}</strong>
               </b-dropdown-item>
-              <b-dropdown-item @click="darSalida(props.row)"
+              <b-dropdown-item @click="llamar(props.row.id)"
+                >Llamar</b-dropdown-item
+              >
+              <b-dropdown-item
+                v-show="props.row.horaLlamada"
+                @click="darSalida(props.row)"
                 >Dar salida</b-dropdown-item
               >
               <b-dropdown-item @click="moverHaciaAdelante(props.index)"
@@ -63,7 +70,7 @@
   </div>
 </template>
 <script>
-import { obtenerUnidades } from '@/services/UnidadesService';
+import { llamarUnidad, obtenerUnidades } from '@/services/UnidadesService';
 import conexion from '@/services/BaseDeDatosService';
 export default {
   data: () => ({
@@ -80,6 +87,10 @@ export default {
     clearTimeout(this.idTimeout);
   },
   methods: {
+    async llamar(id) {
+      await llamarUnidad(id);
+      await this.obtenerUnidades();
+    },
     async moverAlFondo(indice) {
       for (let i = indice + 1; i < this.unidades.length; i++) {
         await this.moverHaciaAdelante(i);

@@ -24,6 +24,10 @@ const obtenerBaseDeDatos = () => {
                 dataType: DATA_TYPE.Number,
                 notNull: true,
             },
+            horaLlamada: {
+                dataType: DATA_TYPE.Number,
+                default: 0,
+            },
             salida: {
                 dataType: DATA_TYPE.Number,
                 default: 0,
