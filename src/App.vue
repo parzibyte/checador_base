@@ -17,7 +17,7 @@
         >
       </template>
     </b-navbar>
-    <section class="section">
+    <section style="padding:0.1rem;" class="section">
       <router-view />
     </section>
   </div>

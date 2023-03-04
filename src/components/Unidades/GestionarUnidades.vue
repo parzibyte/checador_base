@@ -22,83 +22,82 @@
     </b-modal>
     <div class="columns">
       <div class="column">
-        <b-button @click="registrarNuevaUnidad" type="is-info" class="mb-2"
+        <b-button size="is-small" @click="registrarNuevaUnidad" type="is-info" class="mb-1"
           >Registrar nueva</b-button
         >
-        <b-table :loading="cargando" :data="unidades" :striped="true">
-          <b-table-column field="numero" label="Numero" v-slot="props">
-            {{ props.row.numero }}
-          </b-table-column>
-          <b-table-column field="entrada" label="Entrada" v-slot="props">
-            {{ props.row.entrada | fechaAPartirDeMilisegundos }}
-            <strong
-              :style="estiloDeStrong(props.row.horaLlamada)"
-              v-if="props.row.horaLlamada"
+        <div
+          v-for="(unidad, indice) in unidades"
+          :key="unidad.id"
+          style="margin-bottom: 0.1rem; padding: 0"
+          :style="{ backgroundColor: unidad.ruta.color }"
+        >
+          <p>
+            <span class="is-size-4">{{ unidad.numero }}</span>
+            {{ unidad.ruta.nombre }}
+            <b-tag icon="arrow-down-thin">
+              {{ unidad.entrada | fechaAPartirDeMilisegundos }}</b-tag
+            >
+            <b-tag
+              class="ml-1"
+              icon="phone"
+              :type="tipoDeTagParaTiempoTranscurrido(unidad.horaLlamada)"
+              v-show="unidad.horaLlamada"
             >
               {{
-                transcurrido(props.row.horaLlamada) | fechaAPartirDeMilisegundos
+                transcurrido(unidad.horaLlamada) | fechaAPartirDeMilisegundos
               }}
-            </strong>
-            <b-tag type="is-info" v-show="!props.row.horaLlamada">
-              Sale
-              {{ calcularSalida(props.index) | fechaAPartirDeMilisegundos }}
             </b-tag>
-          </b-table-column>
-          <b-table-column
-            :td-attrs="atributosCelda"
-            field="ruta"
-            label="Ruta"
-            v-slot="props"
-          >
-            {{ props.row.ruta.nombre }}
-          </b-table-column>
-          <b-table-column field="numero" label="Opciones" v-slot="props">
+            <b-tag
+              class="ml-2"
+              icon="arrow-up-thin"
+              type="is-primary"
+              v-show="!unidad.horaLlamada"
+            >
+              {{ calcularSalida(indice) | fechaAPartirDeMilisegundos }}
+            </b-tag>
             <b-dropdown>
               <template #trigger="{ active }">
-                <b-button
-                  label="Opciones"
-                  type="is-primary"
-                  :icon-right="active ? 'menu-up' : 'menu-down'"
-                />
+                <b-button class="ml-1" size="is-small" type="is-warning ">
+                  <b-icon
+                    :icon="active ? 'dots-horizontal' : 'dots-horizontal'"
+                  ></b-icon>
+                </b-button>
               </template>
               <b-dropdown-item class="has-text-centered">
                 Unidad
-                <strong>{{ props.row.numero }} </strong>
+                <strong>{{ unidad.numero }} </strong>
                 para
-                <strong> {{ props.row.ruta.nombre }}</strong>
+                <strong> {{ unidad.ruta.nombre }}</strong>
               </b-dropdown-item>
               <b-dropdown-item
-                v-show="!props.row.horaLlamada"
-                @click="llamar(props.row.id)"
+                v-show="!unidad.horaLlamada"
+                @click="llamar(unidad.id)"
                 >Llamar</b-dropdown-item
               >
               <b-dropdown-item
-                v-show="props.row.horaLlamada"
-                @click="darSalida(props.index)"
+                v-show="unidad.horaLlamada"
+                @click="darSalida(indice)"
                 >Dar salida</b-dropdown-item
               >
-              <b-dropdown-item @click="moverHaciaAdelante(props.index)"
+              <b-dropdown-item @click="moverHaciaAdelante(indice)"
                 >Mover hacia adelante</b-dropdown-item
               >
               <b-dropdown-item>Asignar tacopan</b-dropdown-item>
-              <b-dropdown-item @click="eliminarDeLaLista(props.index)"
+              <b-dropdown-item @click="eliminarDeLaLista(indice)"
                 >Eliminar de la lista</b-dropdown-item
               >
-              <b-dropdown-item @click="moverAlFondo(props.index)"
+              <b-dropdown-item @click="moverAlFondo(indice)"
                 >Mover al fondo</b-dropdown-item
               >
-              <b-dropdown-item @click="agregarUnidadAdelante(props.index)"
+              <b-dropdown-item @click="agregarUnidadAdelante(indice)"
                 >Tepepan</b-dropdown-item
               >
-              <b-dropdown-item @click="tacopan(props.index)"
+              <b-dropdown-item @click="tacopan(indice)"
                 >Tacopan</b-dropdown-item
               >
             </b-dropdown>
-          </b-table-column>
-          <template #empty>
-            <div class="has-text-centered">No hay datos</div>
-          </template>
-        </b-table>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -205,6 +204,16 @@ export default {
       this.mostrarModalAgregarUnidad = true;
       // Agregar nueva unidad adelante, solicitar número y ruta que por defecto puede ser Huapaltepec
       // (las demás se recorren sin ningún cambio, solo en el orden). Eso es para Huapaltepec
+    },
+
+    tipoDeTagParaTiempoTranscurrido(horaLlamada) {
+      const ahora = new Date();
+      const diferencia = ahora - horaLlamada;
+      const minutoYMedioEnMilisegundos = 90000;
+      if (diferencia >= minutoYMedioEnMilisegundos) {
+        return "is-danger";
+      }
+      return "is-info";
     },
     estiloDeStrong(horaLlamada) {
       const ahora = new Date();
