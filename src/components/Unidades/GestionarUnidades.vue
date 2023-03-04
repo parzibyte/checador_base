@@ -11,7 +11,10 @@
           </b-table-column>
           <b-table-column field="entrada" label="Entrada" v-slot="props">
             {{ props.row.entrada | fechaAPartirDeMilisegundos }}
-            <strong v-if="props.row.horaLlamada">
+            <strong
+              :style="estiloDeStrong(props.row.horaLlamada)"
+              v-if="props.row.horaLlamada"
+            >
               {{
                 transcurrido(props.row.horaLlamada) | fechaAPartirDeMilisegundos
               }}
@@ -40,7 +43,9 @@
                 para
                 <strong> {{ props.row.ruta.nombre }}</strong>
               </b-dropdown-item>
-              <b-dropdown-item @click="llamar(props.row.id)"
+              <b-dropdown-item
+                v-show="!props.row.horaLlamada"
+                @click="llamar(props.row.id)"
                 >Llamar</b-dropdown-item
               >
               <b-dropdown-item
@@ -70,8 +75,8 @@
   </div>
 </template>
 <script>
-import { llamarUnidad, obtenerUnidades } from '@/services/UnidadesService';
-import conexion from '@/services/BaseDeDatosService';
+import { llamarUnidad, obtenerUnidades } from "@/services/UnidadesService";
+import conexion from "@/services/BaseDeDatosService";
 export default {
   data: () => ({
     cargando: false,
@@ -87,6 +92,15 @@ export default {
     clearTimeout(this.idTimeout);
   },
   methods: {
+    estiloDeStrong(horaLlamada) {
+      const ahora = new Date();
+      const diferencia = ahora - horaLlamada;
+      const minutoYMedioEnMilisegundos = 90000;
+      if (diferencia >= minutoYMedioEnMilisegundos) {
+        return { backgroundColor: "red" };
+      }
+      return {};
+    },
     async llamar(id) {
       await llamarUnidad(id);
       await this.obtenerUnidades();
@@ -102,7 +116,7 @@ export default {
         from: "unidades",
         where: {
           id,
-        }
+        },
       });
       this.cargando = false;
     },
@@ -119,7 +133,7 @@ export default {
           },
           where: {
             id: siguienteUnidad.id,
-          }
+          },
         });
       }
       await this.eliminarUnidad(this.unidades[indice].id);
@@ -132,11 +146,11 @@ export default {
         in: "unidades",
         set: {
           salida: new Date().getTime(),
-          segundosDesdeSalidaAnterior: 999,//TODO: obtener de un lugar confiable
+          segundosDesdeSalidaAnterior: 999, //TODO: obtener de un lugar confiable
         },
         where: {
           id: unidad.id,
-        }
+        },
       });
       this.$buefy.toast.open("Salida marcada correctamente");
       await this.obtenerUnidades();
@@ -144,7 +158,9 @@ export default {
     },
     transcurrido(entrada) {
       const transcurrido = new Date(this.horaActual - new Date(entrada));
-      transcurrido.setTime(transcurrido.getTime() + transcurrido.getTimezoneOffset() * 60 * 1000)
+      transcurrido.setTime(
+        transcurrido.getTime() + transcurrido.getTimezoneOffset() * 60 * 1000
+      );
       return transcurrido;
     },
     refrescarHora() {
@@ -155,7 +171,9 @@ export default {
     async moverHaciaAdelante(indice) {
       this.cargando = true;
       if (indice <= 0) {
-        this.$buefy.toast.open("No se puede mover hacia adelante la primera unidad");
+        this.$buefy.toast.open(
+          "No se puede mover hacia adelante la primera unidad"
+        );
         return;
       }
 
@@ -169,7 +187,7 @@ export default {
         },
         where: {
           id: unidadActual.id,
-        }
+        },
       });
       await conexion.update({
         in: "unidades",
@@ -179,7 +197,7 @@ export default {
         },
         where: {
           id: unidadAnterior.id,
-        }
+        },
       });
       await this.obtenerUnidades();
       this.cargando = false;
@@ -196,9 +214,12 @@ export default {
     },
     async obtenerUnidades() {
       this.cargando = true;
-      this.unidades = await obtenerUnidades(1677692874827, new Date().getTime());
+      this.unidades = await obtenerUnidades(
+        1677692874827,
+        new Date().getTime()
+      );
       this.cargando = false;
     },
-  }
-}
+  },
+};
 </script>

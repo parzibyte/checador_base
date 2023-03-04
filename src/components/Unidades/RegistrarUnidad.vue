@@ -42,10 +42,13 @@
   </div>
 </template>
 <script>
-import TecladoNumerico from '../TecladoNumerico.vue';
-import { obtenerRutas } from '@/services/RutasService';
-import { insertarUnidad, obtenerConteoUnidadesIncluyendoSalidas, } from '@/services/UnidadesService';
-import { obtenerRolSeleccionadoParaElDia } from '@/services/RolesService';
+import TecladoNumerico from "../TecladoNumerico.vue";
+import { obtenerRutas } from "@/services/RutasService";
+import {
+  insertarUnidad,
+  obtenerConteoUnidadesIncluyendoSalidas,
+} from "@/services/UnidadesService";
+import { obtenerRolSeleccionadoParaElDia } from "@/services/RolesService";
 export default {
   components: { TecladoNumerico },
   data: () => ({
@@ -65,7 +68,10 @@ export default {
   },
   methods: {
     async elegirRutaAutomaticamenteSegunRol() {
-      const cantidadUnidades = await obtenerConteoUnidadesIncluyendoSalidas(0, new Date().getTime());
+      const cantidadUnidades = await obtenerConteoUnidadesIncluyendoSalidas(
+        0,
+        new Date().getTime()
+      );
       let indice = cantidadUnidades % this.rolSeleccionado.rutas.length; // Magia TODO: restar especiales y ver si en el índice no hay una deshabilitada
       const rutaSegunRol = this.rolSeleccionado.rutas[indice];
       this.unidad.ruta = rutaSegunRol;
@@ -77,14 +83,21 @@ export default {
       if (!this.unidad.ruta) {
         return;
       }
-      await insertarUnidad(this.unidad.numero, this.unidad.hora.getTime(), this.unidad.ruta);
+      await insertarUnidad(
+        this.unidad.numero,
+        this.unidad.hora.getTime(),
+        this.unidad.ruta
+      );
       this.$buefy.toast.open("Guardada");
       this.unidad = {
         hora: new Date(),
         numero: null,
         ruta: null,
       };
-      await this.elegirRutaAutomaticamenteSegunRol();
+      this.$router.push({
+        name: "GestionarUnidades",
+      });
+      //await this.elegirRutaAutomaticamenteSegunRol();
     },
     onBorrarTodo() {
       this.unidad.numero = null;
@@ -113,6 +126,6 @@ export default {
         this.unidad.numero = null;
       }
     },
-  }
-}
+  },
+};
 </script>
