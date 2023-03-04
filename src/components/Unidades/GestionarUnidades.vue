@@ -20,9 +20,28 @@
         </footer>
       </div>
     </b-modal>
+    <b-modal
+      :active.sync="mostrarModalSeleccionarRuta"
+      has-modal-card
+      :destroy-on-hide="true"
+      trap-focus
+    >
+      <div class="modal-card" style="width: auto">
+        <section class="modal-card-body">
+          <seleccionador-de-rutas @seleccionada="onRutaSeleccionada" />
+        </section>
+        <footer class="modal-card-foot">
+          <b-button @click="cerrarModalSeleccionarRuta()">Cancelar</b-button>
+        </footer>
+      </div>
+    </b-modal>
     <div class="columns">
       <div class="column">
-        <b-button size="is-small" @click="registrarNuevaUnidad" type="is-info" class="mb-1"
+        <b-button
+          size="is-small"
+          @click="registrarNuevaUnidad"
+          type="is-info"
+          class="mb-1"
           >Registrar nueva</b-button
         >
         <div
@@ -82,7 +101,6 @@
               <b-dropdown-item @click="moverHaciaAdelante(indice)"
                 >Mover hacia adelante</b-dropdown-item
               >
-              <b-dropdown-item>Asignar tacopan</b-dropdown-item>
               <b-dropdown-item @click="eliminarDeLaLista(indice)"
                 >Eliminar de la lista</b-dropdown-item
               >
@@ -110,14 +128,16 @@ import {
 } from "@/services/UnidadesService";
 import conexion from "@/services/BaseDeDatosService";
 import RegistrarUnidad from "./RegistrarUnidad.vue";
+import SeleccionadorDeRutas from "../Rutas/SeleccionadorDeRutas.vue";
 export default {
-  components: { RegistrarUnidad },
+  components: { RegistrarUnidad, SeleccionadorDeRutas },
   data: () => ({
     cargando: false,
     unidades: [],
     horaActual: new Date(),
     idTimeout: null,
     mostrarModalAgregarUnidad: false,
+    mostrarModalSeleccionarRuta: false,
     indiceUnidadEditada: {},
   }),
   async mounted() {
@@ -128,24 +148,13 @@ export default {
     clearTimeout(this.idTimeout);
   },
   methods: {
-    calcularSalida(indice) {
-      if (this.unidades.length <= 0) {
-        return 0;
-      }
-      const primeraUnidad = this.unidades[0];
-      if (!primeraUnidad.horaLlamada) {
-        return 0;
-      }
-      return primeraUnidad.horaLlamada + indice * 1000 * 60 * 2.5;
-    },
-    async tacopan(indice) {
+    async onRutaSeleccionada(ruta) {
+      const indice = this.indiceUnidadEditada;
       const unidad = this.unidades[indice];
       await conexion.update({
         in: "unidades",
         set: {
-          ruta: {
-            nombre: "Tacopan--",
-          },
+          ruta,
           esEspecial: true,
         },
         where: {
@@ -164,6 +173,24 @@ export default {
         });
       }
       await this.obtenerUnidades();
+      this.cerrarModalSeleccionarRuta();
+    },
+    cerrarModalSeleccionarRuta() {
+      this.mostrarModalSeleccionarRuta = false;
+    },
+    calcularSalida(indice) {
+      if (this.unidades.length <= 0) {
+        return 0;
+      }
+      const primeraUnidad = this.unidades[0];
+      if (!primeraUnidad.horaLlamada) {
+        return 0;
+      }
+      return primeraUnidad.horaLlamada + indice * 1000 * 60 * 2.5;
+    },
+    async tacopan(indice) {
+      this.indiceUnidadEditada = indice;
+      this.mostrarModalSeleccionarRuta = true;
     },
     async onUnidadAgregadaAdelante(unidad) {
       const unidadEditada = this.unidades[this.indiceUnidadEditada];
