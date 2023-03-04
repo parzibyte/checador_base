@@ -50,7 +50,7 @@
               >
               <b-dropdown-item
                 v-show="props.row.horaLlamada"
-                @click="darSalida(props.row)"
+                @click="darSalida(props.index)"
                 >Dar salida</b-dropdown-item
               >
               <b-dropdown-item @click="moverHaciaAdelante(props.index)"
@@ -140,7 +140,8 @@ export default {
       await this.obtenerUnidades();
       this.cargando = false;
     },
-    async darSalida(unidad) {
+    async darSalida(indice) {
+      const unidad = this.unidades[indice];
       this.cargando = true;
       await conexion.update({
         in: "unidades",
@@ -153,6 +154,14 @@ export default {
         },
       });
       this.$buefy.toast.open("Salida marcada correctamente");
+      console.log({indice});
+      if (indice + 1 < this.unidades.length) {
+        const siguienteUnidad = this.unidades[indice+1];
+        console.log({siguienteUnidad});
+        if (!siguienteUnidad.horaLlamada) {
+          this.llamar(siguienteUnidad.id);
+        }
+      }
       await this.obtenerUnidades();
       this.cargando = false;
     },
