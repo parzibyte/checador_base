@@ -29,15 +29,19 @@
             @borrar="onTeclaBorrada"
             @borrarTodo="onBorrarTodo"
           />
-          <div class="has-text-centered">
-            <b-button
-              class="mr-6"
-              @click="guardar"
-              size="is-large"
-              type="is-success"
-              >Guardar</b-button
-            >
-          </div>
+          <b-button
+            @click="guardar"
+            size="is-large"
+            type="is-success"
+            >Guardar</b-button
+          >
+          <b-button
+          class="ml-2"
+            @click="volver"
+            size="is-large"
+            type="is-info"
+            >Volver</b-button
+          >
         </div>
       </div>
     </div>
@@ -71,6 +75,9 @@ export default {
     this.refrescarHora();
   },
   methods: {
+    volver(){
+      this.$router.go(-1);
+    },
     async elegirRutaAutomaticamenteSegunRol() {
       const cantidadUnidades = await obtenerConteoUnidadesIncluyendoSalidas(
         0,
