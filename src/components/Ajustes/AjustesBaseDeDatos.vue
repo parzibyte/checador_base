@@ -14,19 +14,35 @@
           </b-button>
         </p>
       </b-field>
+      <b-button type="is-danger" @click="eliminarTodaLaBaseDeDatos"
+        >Eliminar toda la base de datos</b-button
+      >
     </div>
   </div>
 </template>
 <script>
-import conexion from '@/services/BaseDeDatosService';
+import conexion from "@/services/BaseDeDatosService";
 export default {
   data: () => ({
     tablaSeleccionada: "",
-    tablas: ["rutas", "ajustes", "unidades", "roles"]
+    tablas: ["rutas", "ajustes", "unidades", "roles"],
   }),
   methods: {
+    async eliminarTodaLaBaseDeDatos() {
+      this.$buefy.dialog.confirm({
+        message: `¿Eliminar base de datos completa? esto no se puede deshacer`,
+        cancelText: "Cancelar",
+        confirmText: "Sí",
+        onConfirm: async () => {
+          await conexion.dropDb();
+          this.$buefy.toast.open(
+            "Base de datos eliminada. Tal vez sea necesario recargar"
+          );
+        },
+      });
+    },
     eliminarTablaSeleccionada() {
-      if(!this.tablaSeleccionada){
+      if (!this.tablaSeleccionada) {
         return;
       }
       this.$buefy.dialog.confirm({
@@ -36,9 +52,9 @@ export default {
         onConfirm: async () => {
           await conexion.clear(this.tablaSeleccionada);
           this.$buefy.toast.open("Tabla limpiada");
-        }
+        },
       });
     },
-  }
-}
+  },
+};
 </script>
