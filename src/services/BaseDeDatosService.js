@@ -60,14 +60,6 @@ const obtenerBaseDeDatos = () => {
                 notNull: true,
                 dataType: DATA_TYPE.String,
             },
-            horarioInicio: {
-                notNull: true,
-                dataType: DATA_TYPE.Number,
-            },
-            horarioFin: {
-                notNull: true,
-                dataType: DATA_TYPE.Number,
-            },
             color: {
                 notNull: true,
                 dataType: DATA_TYPE.String,

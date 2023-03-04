@@ -1,9 +1,9 @@
 import conexion from "./BaseDeDatosService"
 
-export const insertarRuta = async (nombre, horarioInicio, horarioFin, color) => {
+export const insertarRuta = async (nombre, color) => {
     const valoresInsertados = await conexion.insert({
         into: "rutas",
-        values: [{ nombre, horarioInicio, horarioFin, color }],
+        values: [{ nombre, color }],
         return: true,
     })
     return valoresInsertados[0];

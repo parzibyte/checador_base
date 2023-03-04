@@ -16,9 +16,6 @@
           <b-table-column field="nombre" label="Nombre" v-slot="props">
             {{ props.row.nombre }}
           </b-table-column>
-          <b-table-column field="id" label="Horario" v-slot="props">
-            {{ props.row.horarioInicio }} a {{ props.row.horarioFin }}
-          </b-table-column>
           <b-table-column field="id" label="Eliminar" v-slot="props">
             <b-button @click="eliminar(props.row)" type="is-danger">
               <b-icon icon="delete"></b-icon>
