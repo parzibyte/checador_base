@@ -37,10 +37,15 @@ const obtenerBaseDeDatos = () => {
                 dataType: DATA_TYPE.Number,
                 default: 0,
             },
+            esEspecial: {
+                notNull: true,
+                dataType: DATA_TYPE.Boolean,
+                default: false,
+            },
             ruta: {
                 dataType: DATA_TYPE.Object,
                 notNull: true
-            }
+            },
         }
     };
 
