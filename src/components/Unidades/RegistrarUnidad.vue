@@ -29,17 +29,10 @@
             @borrar="onTeclaBorrada"
             @borrarTodo="onBorrarTodo"
           />
-          <b-button
-            @click="guardar"
-            size="is-large"
-            type="is-success"
+          <b-button @click="guardar" size="is-large" type="is-success"
             >Guardar</b-button
           >
-          <b-button
-          class="ml-2"
-            @click="volver"
-            size="is-large"
-            type="is-info"
+          <b-button class="ml-2" @click="volver" size="is-large" type="is-info"
             >Volver</b-button
           >
         </div>
@@ -75,10 +68,16 @@ export default {
     this.refrescarHora();
   },
   methods: {
-    volver(){
+    volver() {
       this.$router.go(-1);
     },
     async elegirRutaAutomaticamenteSegunRol() {
+      if (!this.rolSeleccionado) {
+        this.$buefy.toast.open(
+          "No hay ningún rol seleccionado, imposible determinar ruta automáticamente"
+        );
+        return;
+      }
       const cantidadUnidades = await obtenerConteoUnidadesIncluyendoSalidas(
         0,
         new Date().getTime()
