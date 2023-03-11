@@ -1,5 +1,19 @@
 import conexion from "./BaseDeDatosService"
+export const obtenerTodasLasUnidadesParaReporte = async () => {
+    return await conexion.select({
+        from: "unidades",
+        where: {
+            salida: {
+                "!=": 0,
+            },
+        },
+        order: {
+            by: "salida",
+            type: "asc",
+        }
 
+    });
+}
 export const insertarUnidad = async (numero, entrada, ruta, esEspecial) => {
     esEspecial = esEspecial || false;
     const valoresInsertados = await conexion.insert({

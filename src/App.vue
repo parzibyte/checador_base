@@ -15,22 +15,24 @@
         <b-navbar-item tag="router-link" :to="{ name: 'Ajustes' }">
           <b-icon icon="cog" class="mr-1"></b-icon> Ajustes</b-navbar-item
         >
+        <b-navbar-item tag="router-link" :to="{ name: 'ReporteUnidades' }">
+          <b-icon icon="table" class="mr-1"></b-icon> Reporte</b-navbar-item
+        >
       </template>
     </b-navbar>
-    <section style="padding:0.1rem;" class="section">
+    <section style="padding: 0.1rem" class="section">
       <router-view />
     </section>
   </div>
 </template>
 
 <script>
-import { iniciarBaseDeDatos } from "./services/BaseDeDatosService"
+import { iniciarBaseDeDatos } from "./services/BaseDeDatosService";
 export default {
-  name: 'app',
+  name: "app",
   async beforeCreate() {
     const ok = await iniciarBaseDeDatos();
     console.log({ ok });
   },
-
-}
+};
 </script>

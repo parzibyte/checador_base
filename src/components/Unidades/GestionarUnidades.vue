@@ -51,13 +51,15 @@
           :style="{ backgroundColor: unidad.ruta.color }"
         >
           <p>
-            <span class="is-size-4">{{ indice + 1 }}|{{ unidad.numero }}</span>
-            {{ unidad.ruta.nombre }}
-            <b-tag icon="arrow-down-thin">
-              {{ unidad.entrada | fechaAPartirDeMilisegundos }}</b-tag
-            >
+            <span class="is-size-4"
+              >{{ indice + 1 }}
+              &nbsp; &nbsp;
+              {{ unidad.numero }}
+              {{ unidad.ruta.nombre }}
+            </span>
             <b-tag
               class="ml-1"
+              style="font-size: 1rem"
               icon="phone"
               :type="tipoDeTagParaTiempoTranscurrido(unidad.horaLlamada)"
               v-show="unidad.horaLlamada"
@@ -67,6 +69,7 @@
               }}
             </b-tag>
             <b-tag
+              style="font-size: 1rem"
               class="ml-2"
               icon="arrow-up-thin"
               :type="colorParaTagDePrediccion(indice)"

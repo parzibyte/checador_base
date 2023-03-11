@@ -7,6 +7,7 @@ import GestionarUnidades from '@/components/Unidades/GestionarUnidades'
 import RegistrarRol from '@/components/Roles/RegistrarRol'
 import VerRoles from '@/components/Roles/VerRoles'
 import AjustesBaseDeDatos from '@/components/Ajustes/AjustesBaseDeDatos'
+import ReporteUnidades from '@/components/Unidades/ReporteUnidades'
 
 Vue.use(Router);
 
@@ -47,6 +48,11 @@ export default new Router({
             path: '/ajustes',
             name: 'Ajustes',
             component: AjustesBaseDeDatos
+        },
+        {
+            path: '/reporte',
+            name: 'ReporteUnidades',
+            component: ReporteUnidades
         },
     ]
 });
