@@ -40,8 +40,32 @@ export const obtenerUnidades = async (inicio, fin) => {
     });
 }
 
+
+
+export const obtenerRutasDeUnidad = async (numero, inicio, fin) => {
+    return await conexion.select({
+        from: "unidades",
+        where: {
+            entrada: {
+                "-": {
+                    low: inicio,
+                    high: fin
+                }
+            },
+            salida: {
+                "!=": 0,
+            },
+            numero,
+        },
+        order: {
+            by: "salida",
+            type: "desc",
+        }
+
+    });
+}
+
 export const obtenerUltimaUnidadALaMismaRuta = async (idRuta, inicio, fin) => {
-    console.log({idRuta});
     return await conexion.select({
         from: "unidades",
         where: {
@@ -54,7 +78,8 @@ export const obtenerUltimaUnidadALaMismaRuta = async (idRuta, inicio, fin) => {
             horaLlamada: {
                 "!=": 0,
             },
-           
+            idRuta: idRuta,
+
         },
         order: {
             by: "horaLlamada",

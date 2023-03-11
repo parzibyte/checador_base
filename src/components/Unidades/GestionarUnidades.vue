@@ -69,7 +69,7 @@
             <b-tag
               class="ml-2"
               icon="arrow-up-thin"
-              type="is-primary"
+              :type="colorParaTagDePrediccion(indice)"
               v-show="!unidad.horaLlamada"
             >
               {{ calcularSalida(indice) | fechaAPartirDeMilisegundos }}
@@ -118,6 +118,14 @@
               >
             </b-dropdown>
           </p>
+          <span
+            style="height: 1rem; border: 1px solid black"
+            :style="{ backgroundColor: otraUnidad.ruta.color }"
+            v-for="(otraUnidad, indiceOtraUnidad) in unidad.rutasPrevias"
+            :key="indiceOtraUnidad"
+          >
+            &nbsp; &nbsp; &nbsp;
+          </span>
         </div>
       </div>
     </div>
@@ -127,6 +135,7 @@
 import {
   insertarUnidad,
   llamarUnidad,
+  obtenerRutasDeUnidad,
   obtenerUnidades,
 } from "@/services/UnidadesService";
 import conexion from "@/services/BaseDeDatosService";
@@ -151,6 +160,58 @@ export default {
     clearTimeout(this.idTimeout);
   },
   methods: {
+    colorParaTagDePrediccion(indice) {
+      const salida = this.calcularSalida(indice);
+      const salidaComoFecha = new Date(salida);
+      const ahora = new Date();
+      const añoActual = ahora.getFullYear();
+      const mesActual = ahora.getMonth();
+      const diaActual = ahora.getDate();
+      const horarios = [
+        {
+          color: "is-warning",
+          minutos: [10, 40], // Tacopan
+        },
+        {
+          color: "is-danger",
+          horarios: [
+            // Huapaltepec
+            new Date(añoActual, mesActual, diaActual, 10, 30, 0, 0),
+            new Date(añoActual, mesActual, diaActual, 12, 30, 0, 0),
+            new Date(añoActual, mesActual, diaActual, 14, 30, 0, 0),
+            new Date(añoActual, mesActual, diaActual, 16, 30, 0, 0),
+            new Date(añoActual, mesActual, diaActual, 19, 0, 0, 0),
+          ],
+        },
+      ];
+      for (const horario of horarios) {
+        if (horario.minutos) {
+          for (const minuto of horario.minutos) {
+            const fecha = new Date(
+              salidaComoFecha.getFullYear(),
+              salidaComoFecha.getMonth(),
+              salidaComoFecha.getDate(),
+              salidaComoFecha.getHours(),
+              minuto,
+              0
+            );
+            const diferenciaEnMinutos = (fecha - salida) / 1000 / 60;
+            if (diferenciaEnMinutos >= 0 && diferenciaEnMinutos <= 5) {
+              return horario.color;
+            }
+          }
+        }
+        if (horario.horarios) {
+          for (const otroHorario of horario.horarios) {
+            const diferenciaEnMinutos = (otroHorario - salida) / 1000 / 60;
+            if (diferenciaEnMinutos >= 0 && diferenciaEnMinutos <= 5) {
+              return horario.color;
+            }
+          }
+        }
+      }
+      return "is-info";
+    },
     async onRutaSeleccionada(ruta) {
       const indice = this.indiceUnidadEditada;
       const unidad = this.unidades[indice];
@@ -410,6 +471,13 @@ export default {
     async obtenerUnidades() {
       this.cargando = true;
       let unidades = await obtenerUnidades(1677692874827, new Date().getTime());
+      for (let i = 0; i < unidades.length; i++) {
+        unidades[i].rutasPrevias = await obtenerRutasDeUnidad(
+          unidades[i].numero,
+          0,
+          new Date().getTime()
+        );
+      }
       /*
       console.log({unidades});
       for(let i = 0;i<unidades.length;i++){
