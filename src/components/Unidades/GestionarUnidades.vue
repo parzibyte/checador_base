@@ -99,7 +99,10 @@
                 >Dar salida</b-dropdown-item
               >
               <b-dropdown-item @click="moverHaciaAdelante(indice)"
-                >Mover hacia adelante</b-dropdown-item
+                >Mover número hacia adelante</b-dropdown-item
+              >
+              <b-dropdown-item @click="moverRutaHaciaAdelante(indice)"
+                >Mover ruta hacia adelante</b-dropdown-item
               >
               <b-dropdown-item @click="eliminarDeLaLista(indice)"
                 >Eliminar de la lista</b-dropdown-item
@@ -327,6 +330,38 @@ export default {
       this.horaActual = new Date();
       clearTimeout(this.idTimeout);
       this.idTimeout = setTimeout(this.refrescarHora, 500);
+    },
+
+    async moverRutaHaciaAdelante(indice) {
+      this.cargando = true;
+      if (indice <= 0) {
+        this.$buefy.toast.open(
+          "No se puede mover hacia adelante la primera unidad"
+        );
+        return;
+      }
+      const unidadAnterior = this.unidades[indice - 1];
+      const unidadActual = this.unidades[indice];
+      await conexion.update({
+        in: "unidades",
+        set: {
+          ruta: unidadAnterior.ruta,
+        },
+        where: {
+          id: unidadActual.id,
+        },
+      });
+      await conexion.update({
+        in: "unidades",
+        set: {
+          ruta: unidadActual.ruta,
+        },
+        where: {
+          id: unidadAnterior.id,
+        },
+      });
+      await this.obtenerUnidades();
+      this.cargando = false;
     },
     async moverHaciaAdelante(indice) {
       this.cargando = true;
