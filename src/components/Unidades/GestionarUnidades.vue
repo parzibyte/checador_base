@@ -51,7 +51,7 @@
           :style="{ backgroundColor: unidad.ruta.color }"
         >
           <p>
-            <span class="is-size-4">{{ unidad.numero }}</span>
+            <span class="is-size-4">{{ indice + 1 }}|{{ unidad.numero }}</span>
             {{ unidad.ruta.nombre }}
             <b-tag icon="arrow-down-thin">
               {{ unidad.entrada | fechaAPartirDeMilisegundos }}</b-tag
